@@ -219,6 +219,12 @@
             .planet-1 { width: 50px; height: 50px; top: 10%; left: 5%; }
             .planet-3 { top: 70%; transform: scale(0.7); left: -10px; }
             .song-meta-data { justify-content: center; font-size: 0.7rem; gap: 1rem; }
+            .typewriter { 
+                white-space: normal; /* Esto permite que el texto baje al siguiente renglón */
+                border: none;        /* Quita el cursor parpadeante para que no se vea raro */
+                font-size: 1rem;     /* Ajusta el tamaño */
+                height: auto;        /* Deja que la caja crezca si el texto ocupa dos líneas */
+            }
         }
     </style>
 </head>
@@ -694,4 +700,5 @@ Descansa, mi vida.</div>
         drawStars();
     </script>
 </body>
+
 </html>
