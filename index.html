@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Ella | Nuestro Universo</title>
+    <!-- Fuentes elegantes -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,600;0,700;1,400&family=Montserrat:wght@200;400;500;600&family=Special+Elite&display=swap" rel="stylesheet">
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #020204; 
+            --card-bg: rgba(10, 10, 12, 0.6);
+            --text-main: #f0f0f0;
+            --text-muted: #b0b0b0;
+            --accent: #ffd700; /* Dorado */
+            --accent-dark: #b8860b;
+            --accent-glow: rgba(255, 215, 0, 0.3);
+            --yellow-theme: #f9d71c; 
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 80% 20%, #11111f 0%, #020204 70%);
+            color: var(--text-main);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            line-height: 1.8;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- EFECTOS DE FONDO --- */
+        #star-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -3; pointer-events: none; }
+        .noise-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://grainy-gradients.vercel.app/noise.svg'); opacity: 0.06; pointer-events: none; z-index: -2; }
+        .vignette-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.8) 100%); z-index: -1; pointer-events: none; }
+
+        /* --- EL SOL --- */
+        .sun-container { position: fixed; top: -100px; right: -100px; width: 600px; height: 600px; z-index: -4; pointer-events: none; display: flex; justify-content: center; align-items: center; opacity: 0.7; mix-blend-mode: screen; }
+        .the-sun { width: 160px; height: 160px; background: radial-gradient(circle, #fff 5%, var(--yellow-theme) 40%, #ff8c00 90%); border-radius: 50%; box-shadow: 0 0 50px var(--yellow-theme), 0 0 120px rgba(255, 140, 0, 0.4); position: relative; animation: pulseSun 10s infinite alternate ease-in-out; }
+        .sun-rays { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140%; height: 140%; border-radius: 50%; border: 1px dashed rgba(255, 215, 0, 0.2); animation: spinRays 60s linear infinite; }
+        @keyframes pulseSun { 0% { opacity: 0.7; transform: scale(1); } 100% { opacity: 0.9; transform: scale(1.05); } }
+        @keyframes spinRays { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        /* --- PLANETAS --- */
+        .planet { position: fixed; border-radius: 50%; z-index: -3; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.8); }
+        .planet-1 { width: 80px; height: 80px; top: 15%; left: 10%; background: radial-gradient(circle at 30% 30%, #f0e68c, #b8860b); animation: floatPlanet 25s infinite ease-in-out; opacity: 0.8; }
+        .planet-2 { width: 50px; height: 50px; bottom: 20%; right: 10%; background: #eec900; animation: floatPlanet 35s infinite ease-in-out reverse; opacity: 0.7; }
+        .planet-2::after { content: ''; position: absolute; top: 30%; right: 30%; width: 10px; height: 10px; border-radius: 50%; background: rgba(0,0,0,0.3); }
+        .planet-3 { width: 120px; height: 120px; top: 60%; left: -30px; background: none; box-shadow: none; display: flex; justify-content: center; align-items: center; animation: floatPlanet 40s infinite linear; opacity: 0.8; }
+        .saturn-body { width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #ffd700, #daa520); position: relative; z-index: 2; box-shadow: inset -3px -3px 8px rgba(0,0,0,0.6); }
+        .saturn-ring { position: absolute; width: 140px; height: 30px; border-radius: 50%; border: 4px solid rgba(255, 223, 0, 0.4); border-top: 4px solid rgba(255, 223, 0, 0.7); transform: rotate(-15deg); z-index: 3; }
+        .saturn-ring::before { content: ''; position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px; border-radius: 50%; border: 4px solid transparent; border-top: 4px solid rgba(255, 223, 0, 0.2); z-index: -1; }
+        @keyframes floatPlanet { 0% { transform: translateY(0); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0); } }
+
+        /* --- INTRODUCCIÓN --- */
+        #intro-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: var(--bg-color); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 1.5s ease-in-out, transform 1.5s cubic-bezier(0.22, 1, 0.36, 1); text-align: center; padding: 20px; }
+        .enter-btn { background: rgba(0,0,0,0.5); border: 1px solid var(--accent); color: var(--accent); padding: 1rem 3rem; font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; letter-spacing: 3px; cursor: pointer; transition: all 0.5s ease; margin-top: 2rem; text-transform: uppercase; }
+        .enter-btn:hover { background: rgba(255, 215, 0, 0.1); box-shadow: 0 0 25px var(--accent-glow); color: #fff; }
+        .intro-text { font-family: 'Special Elite', monospace; font-size: 0.9rem; color: var(--text-muted); opacity: 0.7; margin-bottom: 1rem; }
+
+        /* --- CONTENEDOR --- */
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem; position: relative; z-index: 1; opacity: 0; transition: opacity 2s ease; padding-bottom: 120px; }
+        header { height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        h1 { font-family: 'Cormorant Garamond', serif; font-size: 4.5rem; font-weight: 300; margin: 0; letter-spacing: -1px; line-height: 1; font-style: italic; color: #fff; text-shadow: 0 0 20px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 215, 0, 0.2); }
+        .typewriter { font-family: 'Special Elite', monospace; color: var(--accent); font-size: 1.1rem; border-right: 1px solid var(--accent); white-space: nowrap; overflow: hidden; margin-top: 1.5rem; animation: blink 0.75s step-end infinite; max-width: 100%; background: rgba(0,0,0,0.3); padding: 0.2rem 0.5rem; }
+        @keyframes blink { 50% { border-color: transparent; } }
+        section { margin: 8rem 0; opacity: 0; transform: translateY(40px); transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
+        section.visible { opacity: 1; transform: translateY(0); }
+        .section-title { font-family: 'Cormorant Garamond', serif; font-size: 2.8rem; text-align: center; margin-bottom: 3rem; position: relative; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .section-title::after { content: ''; display: block; width: 60px; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); margin: 1rem auto; }
+
+        /* --- NUEVA SECCIÓN: MAPA ESTELAR (Reemplaza Cronología) --- */
+        .star-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        .star-point {
+            background: rgba(10, 10, 15, 0.6);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            padding: 2rem;
+            text-align: center;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+        .star-point:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+            transform: translateY(-5px);
+        }
+        .star-icon {
+            font-size: 2rem; color: var(--accent); margin-bottom: 1rem;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+        .star-title {
+            font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: #fff; margin: 0.5rem 0;
+        }
+        .star-desc {
+            font-family: 'Montserrat', sans-serif; font-size: 0.9rem; color: var(--text-muted);
+        }
+
+        /* --- POLAROIDS DARK LUXURY --- */
+        .polaroid-gallery { display: flex; justify-content: center; flex-wrap: wrap; gap: 3rem; }
+        .polaroid { background: #111; padding: 0.8rem 0.8rem 3rem 0.8rem; width: 220px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 1px solid #333; transform: rotate(-2deg); transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); position: relative; z-index: 1; }
+        .polaroid::before { content: ''; position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px; border: 1px solid rgba(255, 215, 0, 0.3); pointer-events: none; }
+        .polaroid:nth-child(even) { transform: rotate(2deg); }
+        .polaroid:hover { transform: scale(1.1) rotate(0deg) translateY(-10px); z-index: 10; border-color: var(--accent); box-shadow: 0 20px 60px rgba(255, 215, 0, 0.15); }
+        .polaroid img { width: 100%; height: 240px; object-fit: cover; filter: grayscale(60%) contrast(1.1); transition: filter 0.6s; opacity: 0.9; }
+        .polaroid:hover img { filter: grayscale(0%) contrast(1.1); opacity: 1; }
+        .polaroid-caption { font-family: 'Special Elite', monospace; color: var(--accent); text-align: center; margin-top: 1rem; font-size: 0.85rem; letter-spacing: 1px; }
+
+        /* --- SOUNDTRACK LEGENDARIO (Con MÁS COSAS) --- */
+        .soundtrack-wrapper {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 3rem;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(20,20,20,0.9), rgba(10,10,10,0.95));
+            border: 1px solid rgba(255, 215, 0, 0.4); /* Borde más brillante */
+            border-radius: 12px; padding: 4rem 3rem;
+            position: relative; overflow: hidden; margin-top: 4rem;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.1); /* Resplandor exterior */
+            animation: borderPulse 4s infinite alternate; /* Borde pulsante */
+        }
+        @keyframes borderPulse { 0% { border-color: rgba(255, 215, 0, 0.3); } 100% { border-color: rgba(255, 215, 0, 0.6); box-shadow: 0 0 70px rgba(255, 215, 0, 0.2); } }
+
+        /* Luz giratoria de fondo */
+        .soundtrack-wrapper::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, transparent 0%, rgba(255, 215, 0, 0.05) 20%, transparent 40%); animation: rotateLight 10s linear infinite; pointer-events: none; }
+        @keyframes rotateLight { 100% { transform: rotate(360deg); } }
+
+        /* DOBLE Capa de Partículas doradas */
+        .gold-particles-1, .gold-particles-2 { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        .gold-particles-1 { background-image: radial-gradient(var(--accent) 1px, transparent 1px); background-size: 50px 50px; opacity: 0.2; animation: shimmerParticles 15s linear infinite; }
+        .gold-particles-2 { background-image: radial-gradient(var(--accent) 1px, transparent 1px); background-size: 30px 30px; background-position: 15px 15px; opacity: 0.15; animation: shimmerParticles 25s linear infinite reverse; }
+        @keyframes shimmerParticles { 0% { transform: translateY(0); opacity: 0.1; } 50% { opacity: 0.3; } 100% { transform: translateY(-100px); opacity: 0.1; } }
+
+        .vinyl-record { position: absolute; top: 50%; left: 90px; transform: translateY(-50%); width: 280px; height: 280px; background: url('https://upload.wikimedia.org/wikipedia/commons/b/b6/Vinyl_record.svg') no-repeat center; background-size: contain; border-radius: 50%; z-index: 0; animation: spinVinyl 4s linear infinite; opacity: 0.8; transition: left 0.5s ease; filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); }
+        .soundtrack-wrapper:hover .vinyl-record { left: 220px; opacity: 1; }
+        @keyframes spinVinyl { 100% { transform: translateY(-50%) rotate(360deg); } }
+
+        .album-visual { position: relative; width: 280px; height: 280px; z-index: 2; perspective: 1000px; }
+        .album-cover-img { width: 100%; height: 100%; object-fit: cover; box-shadow: 0 20px 50px rgba(0,0,0,0.8); border: 1px solid rgba(255,215,0,0.3); border-radius: 4px; }
+        .globe-icon { position: absolute; top: -35px; right: -35px; font-size: 3.5rem; color: var(--yellow-theme); animation: spinSlow 12s linear infinite; text-shadow: 0 0 25px rgba(245, 215, 110, 0.8); z-index: 5; }
+        @keyframes spinSlow { 100% { transform: rotate(360deg); } }
+
+        .soundtrack-info { flex: 1; min-width: 300px; z-index: 2; text-align: left; padding-left: 2rem; }
+        .soundtrack-label { font-family: 'Special Elite', monospace; color: var(--accent); font-size: 0.9rem; letter-spacing: 4px; margin-bottom: 0.5rem; display: inline-block; border-bottom: 1px solid var(--accent); padding-bottom: 5px; text-transform: uppercase; }
+        .song-title-large { font-family: 'Cormorant Garamond', serif; font-size: 4rem; line-height: 1; margin-bottom: 0.5rem; color: #fff; text-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
+        .artist-large { font-family: 'Montserrat', sans-serif; font-size: 1.2rem; color: var(--text-muted); margin-bottom: 1.5rem; display: block; letter-spacing: 4px; text-transform: uppercase; }
+
+        /* NUEVOS METADATOS DE CANCIÓN */
+        .song-meta-data {
+            display: flex; gap: 1.5rem; margin-bottom: 2rem;
+            font-family: 'Special Elite', monospace; font-size: 0.8rem; color: var(--accent);
+            border-top: 1px solid rgba(255, 215, 0, 0.2); border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            padding: 0.8rem 0;
+        }
+        .song-meta-data span { display: flex; align-items: center; gap: 0.5rem; }
+        .song-meta-data i { color: var(--yellow-theme); }
+
+        .audio-wave { display: flex; align-items: center; gap: 5px; height: 40px; margin-bottom: 2rem; }
+        .wave-bar { width: 4px; background: linear-gradient(to top, var(--accent-dark), var(--accent)); border-radius: 2px; animation: waveAnim 1s ease-in-out infinite; box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
+        @keyframes waveAnim { 0%, 100% { height: 15%; opacity: 0.6; } 50% { height: 100%; opacity: 1; } }
+        .wave-bar:nth-child(odd) { animation-duration: 0.9s; }
+        .wave-bar:nth-child(2n) { animation-duration: 1.2s; }
+
+        .lyrics-quote { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-style: italic; color: #fff; margin-bottom: 1.5rem; position: relative; z-index: 1; }
+        .lyrics-quote::before { content: '“'; position: absolute; left: -30px; top: -40px; font-size: 8rem; color: rgba(255, 215, 0, 0.1); font-family: serif; z-index: -1; }
+        .theme-explanation { font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #ccc; line-height: 1.7; border-left: 2px solid var(--accent); padding-left: 1.5rem; }
+
+        /* --- CARTAS (Fondo Oscuro) --- */
+        .open-when-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .envelope-card { background: rgba(10, 10, 15, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); padding: 2.5rem 2rem; position: relative; cursor: pointer; transition: all 0.4s ease; backdrop-filter: blur(5px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .envelope-card:hover { border-color: var(--accent); background: rgba(15, 15, 20, 0.95); transform: translateY(-5px); box-shadow: 0 15px 40px rgba(255, 215, 0, 0.1); }
+        .envelope-card.active { border-color: var(--accent); background: rgba(20, 20, 25, 1); }
+        .envelope-title { font-family: 'Montserrat', sans-serif; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; color: #ccc; margin-bottom: 1rem; font-weight: 600; }
+        .envelope-card:hover .envelope-title { color: var(--accent); }
+        .envelope-content { height: 0; opacity: 0; overflow: hidden; transition: all 0.5s ease; font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; margin-top: 0; color: #e0e0e0; line-height: 1.6; }
+        .envelope-card.active .envelope-content { height: auto; opacity: 1; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 215, 0, 0.3); }
+        .icon-seal { position: absolute; top: 1.5rem; right: 1.5rem; color: var(--accent); opacity: 0.5; font-size: 1.2rem; }
+
+        /* --- RECORDATORIO --- */
+        .reminder-box { text-align: center; border: 1px solid rgba(255, 215, 0, 0.3); padding: 4rem 2rem; border-radius: 8px; background: rgba(10, 10, 12, 0.8); backdrop-filter: blur(5px); box-shadow: 0 0 30px rgba(255, 215, 0, 0.05); }
+        .reminder-content { font-family: 'Cormorant Garamond', serif; font-size: 2rem; min-height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 2rem; font-style: italic; color: #fff; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+        .reminder-btn { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 1rem 3rem; font-family: 'Montserrat', sans-serif; font-weight: bold; font-size: 0.9rem; letter-spacing: 3px; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
+        .reminder-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 40px var(--accent-glow); }
+
+        /* --- REPRODUCTOR --- */
+        .player-container { position: fixed; bottom: 2rem; right: 2rem; display: flex; align-items: center; gap: 15px; background: rgba(5, 5, 5, 0.95); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px 20px; border-radius: 4px; z-index: 100; transition: transform 0.3s; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        .player-container:hover { border-color: var(--accent); }
+        .vinyl-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--yellow-theme); animation: spin 4s linear infinite paused; flex-shrink: 0; border: 2px solid #000; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
+        .playing .vinyl-icon { animation-play-state: running; }
+        .song-name { color: #fff; font-weight: 600; font-size: 0.9rem; }
+        .artist-name { color: #888; font-family: 'Special Elite', monospace; font-size: 0.7rem; }
+        .play-btn { background: none; border: none; color: #fff; cursor: pointer; font-size: 1.2rem; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* MÓVIL */
+        @media (max-width: 768px) {
+            h1 { font-size: 3.5rem; }
+            .container { padding: 1.5rem; padding-bottom: 140px; }
+            .section-title { font-size: 2.2rem; }
+            .player-container { bottom: 1rem; right: 50%; transform: translateX(50%); width: 90%; justify-content: space-between; }
+            .polaroid { width: 140px; }
+            .polaroid img { height: 160px; }
+            .soundtrack-wrapper { padding: 2rem 1.5rem; text-align: center; }
+            .soundtrack-info { text-align: center; padding-left: 0; }
+            .vinyl-record { display: none; }
+            .audio-wave { justify-content: center; }
+            .lyrics-quote { border-left: none; border-top: 2px solid var(--accent); padding-top: 1rem; padding-left: 0; border-radius: 0; }
+            .globe-icon { top: -15px; right: -10px; font-size: 2.5rem; }
+            .sun-container { width: 300px; height: 300px; top: -50px; right: -50px; }
+            .the-sun { width: 100px; height: 100px; }
+            .planet-1 { width: 50px; height: 50px; top: 10%; left: 5%; }
+            .planet-3 { top: 70%; transform: scale(0.7); left: -10px; }
+            .song-meta-data { justify-content: center; font-size: 0.7rem; gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="noise-overlay"></div>
+    <div class="vignette-overlay"></div>
+    <canvas id="star-canvas"></canvas>
+
+    <!-- EL SOL ROMÁNTICO -->
+    <div class="sun-container">
+        <div class="the-sun">
+            <div class="sun-rays"></div>
+        </div>
+    </div>
+
+    <!-- PLANETAS FLOTANTES -->
+    <div class="planet planet-1"></div>
+    <div class="planet planet-2"></div>
+    <div class="planet planet-3"> <!-- Saturno -->
+        <div class="saturn-ring"></div>
+        <div class="saturn-body"></div>
+    </div>
+
+    <!-- INTRODUCCIÓN -->
+    <div id="intro-screen">
+        <div class="intro-text">Capítulo 1: El Inicio</div>
+        <button class="enter-btn" onclick="enterSite()">ENTRAR</button>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div class="container" id="main-content">
+        
+        <header>
+            <div style="font-family: 'Special Elite'; color: var(--accent); margin-bottom: 1rem; letter-spacing: 3px; font-size: 0.8rem;">01 MES</div>
+            <h1>Musa & Caos</h1>
+            <div class="typewriter" id="typewriter-text"></div>
+        </header>
+
+        <!-- 1. NUEVA SECCIÓN: MAPA ESTELAR (Reemplaza Cronología) -->
+        <section class="fade-on-scroll">
+            <h2 class="section-title">Nuestro Mapa Estelar</h2>
+            <div class="star-map-grid">
+                <div class="star-point">
+                    <i class="fa-solid fa-meteor star-icon"></i>
+                    <h3 class="star-title">El Primer Destello</h3>
+                    <p class="star-desc">Cuando nuestras órbitas se cruzaron por casualidad y el universo pareció detenerse un segundo.</p>
+                </div>
+                <div class="star-point">
+                    <i class="fa-solid fa-user-astronaut star-icon"></i>
+                    <h3 class="star-title">La Gravedad</h3>
+                    <p class="star-desc">Ese momento inevitable donde supe que ya no quería alejarme de tu campo gravitacional.</p>
+                </div>
+                <div class="star-point">
+                    <i class="fa-solid fa-satellite-dish star-icon"></i>
+                    <h3 class="star-title">La Señal Clara</h3>
+                    <p class="star-desc">Cuando entendí que, en medio de todo el ruido del espacio, sintonizamos la misma frecuencia.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. GALERÍA POLAROID DARK LUXURY -->
+        <section class="fade-on-scroll">
+            <h2 class="section-title">Fragmentos</h2>
+            <div class="polaroid-gallery">
+                <div class="polaroid">
+                    <img src="imagenes\5015085608073890757.jpg" alt="Nosotros">
+                    <div class="polaroid-caption">Esa tarde</div>
+                </div>
+                <div class="polaroid">
+                    <img src="imagenes\5015085608073890756 (1).jpg" alt="Tu sonrisa">
+                    <div class="polaroid-caption">Tu sonrisa</div>
+                </div>
+                <div class="polaroid">
+                    <img src="imagenes\5015085608073890758.jpg" alt="Juntos">
+                    <div class="polaroid-caption">Caos</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SOUNDTRACK DEL MES: LEGENDARY EDITION PLUS -->
+        <section class="fade-on-scroll">
+            <h2 class="section-title">Soundtrack</h2>
+            <div class="soundtrack-wrapper">
+                
+                <!-- DOBLE CAPA DE PARTÍCULAS -->
+                <div class="gold-particles-1"></div>
+                <div class="gold-particles-2"></div>
+                
+                <div class="vinyl-record"></div>
+
+                <div class="album-visual">
+                    <img src="imagenes\YELLOW _33.jpg" class="album-cover-img" alt="Yellow Cover">
+                    <div class="globe-icon"><i class="fa-solid fa-earth-americas"></i></div>
+                </div>
+
+                <div class="soundtrack-info">
+                    <span class="soundtrack-label">Capítulo 1 // Artefacto Principal</span>
+                    <div class="song-title-large">Yellow</div>
+                    <span class="artist-large">Coldplay</span>
+                    
+                    <!-- NUEVOS METADATOS DE CANCIÓN -->
+                    <div class="song-meta-data">
+                        <span><i class="fa-solid fa-heart-pulse"></i> BPM: 87</span>
+                        <span><i class="fa-solid fa-music"></i> Tonalidad: B Major</span>
+                        <span><i class="fa-solid fa-infinity"></i> Reproducciones: Infinito</span>
+                    </div>
+
+                    <div class="audio-wave">
+                        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                    </div>
+
+                    <p class="lyrics-quote">Look at the stars, look how they shine for you...</p>
+                    
+                    <div class="theme-explanation">
+                        <p>
+                            Elegí esta canción porque cuando llegaste, todo mi mundo en blanco y negro de repente se llenó de color. 
+                            Eres esa luz amarilla, cálida y brillante que guía mi camino.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. CARTAS INTERACTIVAS -->
+        <section class="fade-on-scroll">
+            <h2 class="section-title">Ábrelo cuando...</h2>
+            <div class="open-when-grid">
+                
+                <div class="envelope-card" onclick="toggleEnvelope(this)" 
+                     data-song="All of the Stars" data-artist="Ed Sheeran"
+                     data-src="audio\Ed_Sheeran_All_Of_The_Stars_Official_Music_VideoMP3_160K.mp3">
+                    <i class="fa-solid fa-moon icon-seal"></i>
+                    <div class="envelope-title">Me extrañes</div>
+                    <div class="envelope-content">Si estás leyendo esto, es porque necesitas sentir que estoy ahí, contigo.
+
+Quiero que sepas que vives en mis pensamientos más callados. Eres ese suspiro que se me escapa sin querer cuando el mundo se detiene un instante.
+
+Aunque mis ojos no te estén mirando ahora mismo, mi corazón no sabe estar en otro lugar que no sea a tu lado. Te acompaño en cada paso, en lo invisible, en la calma.
+
+Siénteme cerca, porque mi alma siempre está abrazando la tuya.</div>
+                </div>
+                
+                <div class="envelope-card" onclick="toggleEnvelope(this)" 
+                     data-song="Fix You" data-artist="Coldplay"
+                     data-src="audio\Fix you • Coldplay _ Letra en español _ inglés(MP3_160K).mp3">
+                    <i class="fa-solid fa-cloud-rain icon-seal"></i>
+                    <div class="envelope-title">Estés triste</div>
+                    <div class="envelope-content">Si has abierto este sobre, es porque hoy el mundo se siente gris y necesitas un abrazo que te reinicie.
+
+No te voy a pedir que sonrías si no tienes ganas. Solo quiero recordarte que no tienes que cargar con todo tú sola. Mi amor por ti es un refugio donde puedes descansar, soltar y ser vulnerable sin miedo.
+
+Me gustaría ser el silencio que te calma y la mano que seca tus lágrimas antes de que caigan. Pero, aunque no pueda evitar que estés triste, prometo quedarme a tu lado hasta que pase la tormenta.
+
+Eres mi luz, incluso en tus días nublados. Descansa en mí, que yo sostengo tu corazón.
+
+Estoy contigo, siempre.</div>
+                </div>
+
+                <div class="envelope-card" onclick="toggleEnvelope(this)" 
+                     data-song="All my love" data-artist="Coldplay"
+                     data-src="audio\Coldplay - ALL MY LOVE __ Lyrics   Español(MP3_160K).mp3">
+                    <i class="fa-solid fa-heart icon-seal"></i>
+                    <div class="envelope-title">Me ames</div>
+                    <div class="envelope-content">Quiero que sepas que sentir tu amor es la calma más profunda que conozco. Es un regalo que cuido en silencio, como lo más valioso que tengo.
+
+No fue casualidad encontrarnos; fue el universo poniendo cada pieza en su lugar para que tú y yo coincidiéramos. Eres el destino al que siempre quise llegar.
+
+Gracias por elegirme. Yo te sigo eligiendo a ti en cada suspiro, en cada silencio y en todas las vidas que nos falten.
+
+Te amo con el alma.</div>
+                </div>
+
+                <div class="envelope-card" onclick="toggleEnvelope(this)" 
+                     data-song="Perfect" data-artist="Ed Sheeran"
+                     data-src="audio\Ed Sheeran - Perfect (Official Music Video)(MP3_160K).mp3">
+                    <i class="fa-solid fa-sun icon-seal"></i>
+                    <div class="envelope-title">Estés feliz</div>
+                    <div class="envelope-content">Quiero que sepas que tu felicidad es mi paz absoluta. No hay paisaje más hermoso ni melodía más dulce que saber que tu corazón está contento.
+
+Eres la obra de arte que la vida me ha permitido contemplar. Me gustaría poder detener el tiempo justo ahora, congelar este instante, y quedarme a vivir para siempre en el brillo de tus ojos.
+
+Sigue brillando, mi vida, que tu luz es lo que guía mi alma en silencio.</div>
+                </div>
+
+                <div class="envelope-card" onclick="toggleEnvelope(this)" 
+                     data-song="Thinking Out Loud" data-artist="Ed Sheeran"
+                     data-src="audio\Ed_Sheeran_Thinking_Out_Loud_Official_Music_VideoMP3_160K.mp3">
+                    <i class="fa-solid fa-shield-heart icon-seal"></i>
+                    <div class="envelope-title">Tengas miedo</div>
+                    <div class="envelope-content">Si has buscado esta carta, es porque necesitas sentirte a salvo.
+
+Quiero que respires profundo y sepas que, aquí conmigo, nada malo puede tocarte. Mi amor es un refugio donde el miedo no tiene entrada.
+
+Me gustaría ser la calma que aquieta tu alma y el muro que te separa de todo lo que te inquieta. Aunque todo afuera haga ruido, dentro de nosotros solo existe paz.
+
+Cierra los ojos y refúgiate en mí. Mi alma está de guardia, velando tus sueños y sosteniendo tu mano en lo invisible.
+
+No tengas miedo. Yo te cuido.</div>
+                </div>
+
+                <div class="envelope-card" onclick="toggleEnvelope(this)" 
+                     data-song="Talking to the Moon" data-artist="Bruno Mars"
+                     data-src="audio\Bruno_Mars_Talking_To_The_Moon_Official_Lyric_VideoMP3_160K.mp3">
+                    <i class="fa-solid fa-star icon-seal"></i>
+                    <div class="envelope-title">No puedas dormir</div>
+                    <div class="envelope-content">Si has abierto este sobre, es porque el sueño se resiste y la noche se siente inmensa.
+
+Quiero ser la calma que respiras en este instante. En medio de este silencio, mi alma se escapa para acostarse a tu lado y cubrirte.
+
+No fuerces el sueño; solo cierra los ojos y déjate llevar por mi cariño, que te arrulla desde lo invisible. Yo me quedo despierto cuidándote, velando tu descanso para que nada interrumpa tu paz.
+
+Suelta el peso del día y ven a buscarme. Te estoy esperando en mis sueños.
+
+Descansa, mi vida.</div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. RECORDATORIO -->
+        <section class="fade-on-scroll">
+            <h2 class="section-title">Recordatorio Diario</h2>
+            <div class="reminder-box">
+                <p class="reminder-content" id="reminder-text">
+                    "Haz clic si necesitas una razón."
+                </p>
+                <button class="reminder-btn" onclick="generateReminder()">
+                    Recordar
+                </button>
+            </div>
+        </section>
+
+        <section class="fade-on-scroll" style="text-align: right; margin-top: 5rem;">
+            <p style="font-family: 'Montserrat'; font-size: 0.9rem; letter-spacing: 2px; color: var(--text-muted);">CON AMOR,</p>
+            <div style="font-family: 'Allura', cursive; font-size: 2.2rem; color: var(--accent); margin-top: 0.5rem;">JOSE ENRIQUE, QUIEN TE AMA CON TODO SU SER.</div>
+        </section>
+    </div>
+
+    <!-- REPRODUCTOR -->
+    <div class="player-container" id="player">
+        <div class="vinyl-icon"></div>
+        <div class="player-info">
+            <span class="song-name" id="current-song-title">Yellow</span>
+            <span class="artist-name" id="current-artist">Coldplay</span>
+        </div>
+        <button class="play-btn" onclick="toggleMusic()">
+            <i class="fa-solid fa-play" id="play-icon"></i>
+        </button>
+        <audio id="audio-file" src="audio\Coldplay - Yellow (Official Video)(MP3_160K).mp3" loop></audio>
+    </div>
+
+    <script>
+        // --- 1. INTRODUCCIÓN ---
+        function enterSite() {
+            const intro = document.getElementById('intro-screen');
+            const content = document.getElementById('main-content');
+            const audio = document.getElementById('audio-file');
+
+            intro.style.opacity = '0';
+            intro.style.transform = 'scale(1.1)';
+            
+            setTimeout(() => {
+                intro.style.display = 'none';
+                content.style.opacity = '1';
+                startTypewriter();
+            }, 1000);
+
+            audio.volume = 0.5;
+            audio.play().then(() => {
+                isPlaying = true;
+                updatePlayerVisuals();
+            }).catch(e => console.log("Audio requiere interacción"));
+        }
+
+        // --- 2. TYPEWRITER ---
+        const textToType = "Razones por las que mi mundo gira contigo.";
+        const typeWriterElement = document.getElementById('typewriter-text');
+
+        function startTypewriter() {
+            let i = 0;
+            typeWriterElement.innerHTML = "";
+            function type() {
+                if (i < textToType.length) {
+                    typeWriterElement.innerHTML += textToType.charAt(i);
+                    i++;
+                    setTimeout(type, 100);
+                } else {
+                    typeWriterElement.style.borderRight = "none";
+                }
+            }
+            type();
+        }
+
+        // --- 3. RECORDATORIOS ---
+        const reminders = [
+            "Porque tienes la risa más bonita que he escuchado.",
+            "Porque haces que los días grises tengan color.",
+            "Por la forma en que me miras cuando crees que no me doy cuenta.",
+            "Porque eres mi lugar seguro en el mundo.",
+            "Porque contigo, incluso el silencio es cómodo.",
+            "Por tu inteligencia y tu forma de ver la vida.",
+            "Porque nadie me abraza como tú."
+        ];
+
+        function generateReminder() {
+            const textElement = document.getElementById('reminder-text');
+            textElement.style.opacity = 0;
+            setTimeout(() => {
+                const randomIndex = Math.floor(Math.random() * reminders.length);
+                textElement.innerText = `"${reminders[randomIndex]}"`;
+                textElement.style.opacity = 1;
+            }, 300);
+        }
+
+        // --- 4. MÚSICA Y CARTAS ---
+        function toggleEnvelope(card) {
+            const songTitle = document.getElementById('current-song-title');
+            const artistName = document.getElementById('current-artist');
+            const audio = document.getElementById('audio-file');
+            
+            if (card.classList.contains('active')) {
+                card.classList.remove('active');
+                return;
+            }
+
+            document.querySelectorAll('.envelope-card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+
+            const newSongName = card.getAttribute('data-song');
+            const newArtistName = card.getAttribute('data-artist');
+            const newAudioSrc = card.getAttribute('data-src');
+
+            if (newAudioSrc && newAudioSrc !== audio.src) {
+                audio.src = newAudioSrc;
+                audio.play();
+                isPlaying = true;
+                updatePlayerVisuals();
+            }
+
+            if (newSongName) {
+                songTitle.innerText = newSongName;
+                artistName.innerText = newArtistName;
+            }
+        }
+
+        // --- 5. REPRODUCTOR ---
+        let isPlaying = false;
+        const player = document.getElementById('player');
+        const playIcon = document.getElementById('play-icon');
+        const audio = document.getElementById('audio-file'); 
+
+        function toggleMusic() {
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+            } else {
+                audio.play();
+                isPlaying = true;
+            }
+            updatePlayerVisuals();
+        }
+
+        function updatePlayerVisuals() {
+            if (isPlaying) {
+                player.classList.add('playing');
+                playIcon.classList.remove('fa-play');
+                playIcon.classList.add('fa-pause');
+            } else {
+                player.classList.remove('playing');
+                playIcon.classList.remove('fa-pause');
+                playIcon.classList.add('fa-play');
+            }
+        }
+
+        // --- 6. SCROLL ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-on-scroll').forEach(section => observer.observe(section));
+
+        // --- 7. ESTRELLAS Y ESTRELLAS FUGACES ---
+        const canvas = document.getElementById('star-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, stars = [];
+        let shootingStar = null;
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            initStars();
+        }
+
+        function initStars() {
+            stars = [];
+            const numStars = Math.floor(width * height / 10000); 
+            for (let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    radius: Math.random() * 1.5,
+                    vx: (Math.random() - 0.5) * 0.2,
+                    vy: (Math.random() - 0.5) * 0.2,
+                    alpha: Math.random()
+                });
+            }
+        }
+
+        function createShootingStar() {
+            if (Math.random() < 0.005 && !shootingStar) { 
+                shootingStar = {
+                    x: Math.random() * width,
+                    y: Math.random() * height / 2,
+                    length: Math.random() * 80 + 50,
+                    speed: Math.random() * 10 + 5,
+                    angle: Math.PI / 4 
+                };
+            }
+        }
+
+        function drawShootingStar() {
+            if (!shootingStar) return;
+            const endX = shootingStar.x + shootingStar.length * Math.cos(shootingStar.angle);
+            const endY = shootingStar.y + shootingStar.length * Math.sin(shootingStar.angle);
+            
+            const gradient = ctx.createLinearGradient(shootingStar.x, shootingStar.y, endX, endY);
+            gradient.addColorStop(0, 'rgba(255, 215, 0, 1)'); // Dorado para estrella fugaz
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+            ctx.beginPath();
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 2;
+            ctx.moveTo(shootingStar.x, shootingStar.y);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+
+            shootingStar.x += shootingStar.speed * Math.cos(shootingStar.angle);
+            shootingStar.y += shootingStar.speed * Math.sin(shootingStar.angle);
+
+            if (shootingStar.x > width || shootingStar.y > height) shootingStar = null;
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, width, height);
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                ctx.fill();
+                star.x += star.vx; star.y += star.vy;
+                if (star.x < 0) star.x = width;
+                if (star.x > width) star.x = 0;
+                if (star.y < 0) star.y = height;
+                if (star.y > height) star.y = 0;
+            });
+            createShootingStar();
+            drawShootingStar();
+            requestAnimationFrame(drawStars);
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+        drawStars();
+    </script>
+</body>
+</html>
